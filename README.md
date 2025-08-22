@@ -1,16 +1,18 @@
-## Hi there 👋
+# Hi, I'm Andre Mendoza! 👋
 
-<!--
-**mendozaa8758/mendozaa8758** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+## About Me
+Currently taking CSC-113 AI Fundamentals and learning to collaborate with AI tools!
 
-Here are some ideas to get you started:
+## My Foo 🎯
+My passion is for video games and video game art, and I am already practicing how to draw landscapes and abstract art before learning how to draw realisitc bodies.
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+## Currently Learning
+- 🤖 AI collaboration and prompt engineering
+- 🐙 GitHub workflows and version control
+- 💡 Building my first AI assistants
+
+## Fun Fact
+I've managed to 100% Every 3D Zelda game from Ocarina of time all the way to Skyward Sword, BOTW is too big to finish as a full time student.
+
+## Find Me
+- 📫 Right here on GitHub!
