@@ -12,7 +12,7 @@ My passion is for video games and video game art, and I am already practicing ho
 - 💡 Building my first AI assistants
 
 ## Fun Fact
-I've managed to 100% Every 3D Zelda game from Ocarina of time all the way to Skyward Sword, BOTW is too big to finish as a full time student.
+I've managed to 100% Every 3D Zelda game from Ocarina of time all the way to Skyward Sword, BOTW is too big to finish as a full time student. So is TOTK!
 
 ## Find Me
 - 📫 Right here on GitHub!
