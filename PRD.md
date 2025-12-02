@@ -1,0 +1,78 @@
+1. Project Overview
+What does it do? (1–2 sentences)
+
+A simple web-based tool that automatically generates competitive Pokémon teams.
+Users choose a format or style, and the app outputs a balanced 6-Pokémon team instantly.
+Who is it for?
+Pokémon players (beginners to intermediate) who struggle with team building or want fast inspiration.
+What problem does it solve?
+Competitive team building is difficult, time-consuming, and requires deep knowledge of typings, roles, and synergy. This tool generates usable, balanced teams automatically so players can start battling faster.
+
+2. Core Features (MVP: 3 features)
+Feature 1: Team Generation (Core Engine)
+Description:
+User selects a team type (e.g., “Balanced,” “Offensive,” “Random”) and the system generates a 6-Pokémon team using pre-defined lists, roles, and type synergy rules.
+Why it matters:
+This is the core value: it removes the need for users to manually assemble a viable team.
+Success criteria:
+Generates a complete team of 6 Pokémon every time.
+Ensures no egregious type weaknesses (e.g., 4+ Pokémon weak to the same type).
+Team includes diverse roles (tank, sweeper, support) when applicable.
+
+Feature 2: Basic Format Selection
+Description:
+User can choose between a few preset formats (e.g., Singles OU, VGC Doubles, Random Casual). Each format pulls from its own restricted Pokémon list.
+Why it matters:
+Different formats require different sets of Pokémon; this keeps teams relevant and usable.
+Success criteria:
+User can switch between at least 2–3 formats.
+Team generator uses the correct pool for each format.
+
+Feature 3: Export / Copy Team
+Description:
+Simple “Copy Team” button that outputs the generated team in a clean text format (e.g., Showdown-compatible text or a readable block).
+Why it matters:
+Users need an easy way to copy their team into Pokémon Showdown or save it elsewhere.
+Success criteria:
+Single click copies full team text to clipboard.
+Output is formatted consistently and clearly.
+
+3. User Experience (UX Flow)
+What does the user see first?
+A clean landing page with:
+Title “Pokémon Team Generator”
+A dropdown to choose the format
+A button: “Generate Team”
+What can they do?
+Select a format
+Generate a new team
+View the generated team list
+Copy/export the team
+Click “Generate Again” to refresh
+Interaction Flow (Step-by-Step)
+User opens the app and sees a single-page layout with a format dropdown.
+User selects a format (Balanced, Offensive, OU, VGC, etc.).
+User clicks Generate Team.
+The system generates 6 Pokémon based on rules and displays them.
+User can click Copy Team to copy it to clipboard.
+User can click Generate Again to regenerate a new team using the same format.
+
+4. Technical Constraints
+Single Page Application (SPA)
+Browser-only client-side logic
+No server-side or backend required
+Pokémon data stored in JSON (local file or embedded object)
+Allowed: React / Vue / Svelte / Vanilla JS (choice up to implementer)
+State managed client-side only
+Team generation rules must run entirely in the browser
+
+5. Out of Scope for V1 (Not Included Yet)
+Pokémon movesets, EV spreads, or competitive optimization
+User accounts or saving teams to cloud
+Real-time type chart visualizations
+AI-generated custom roles or strategies
+Full Pokédex search system
+Backend database or API integrations
+or dedicated native UI
+
+Online multiplayer or in-app battling
