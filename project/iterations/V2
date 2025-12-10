@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokémon Team Generator</title>
+    <style>
+        /* ------------------------------------------- */
+        /* --- 1. LIGHT MODE (Default) STYLING --- */
+        /* ------------------------------------------- */
+        :root {
+            /* Colors */
+            --bg-body: #f0f2f5;
+            --bg-container: #ffffff;
+            --bg-controls: #ecf0f1;
+            --text-primary: #333;
+            --text-secondary: #555;
+            --text-heading: #2c3e50;
+            --border-default: #ddd;
+            --border-dashed: #bdc3c7;
+            --color-primary: #3498db;
+            --color-success: #2ecc71;
+            --color-placeholder: #95a5a6;
+        }
+
+        /* ------------------------------------------- */
+        /* --- 2. DARK MODE STYLING --- */
+        /* ------------------------------------------- */
+        :root.dark-mode {
+            /* Dark Backgrounds */
+            --bg-body: #1e1e1e;
+            --bg-container: #2d2d30;
+            --bg-controls: #38383a;
+
+            /* Light Text */
+            --text-primary: #f0f0f0;
+            --text-secondary: #b0b0b0;
+            --text-heading: #ffffff;
+            --border-default: #444;
+            --border-dashed: #555;
+
+            /* Accent Colors (Keep similar hue but slightly darker/brighter for contrast) */
+            --color-primary: #5da4df; /* Lighter blue */
+            --color-success: #55d487; /* Lighter green */
+            --color-placeholder: #7f8c8d;
+        }
+
+        /* --- Global Elements --- */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+
+        .container {
+            background-color: var(--bg-container);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            max-width: 800px;
+            width: 95%;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        h1 {
+            color: var(--text-heading);
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 2em;
+        }
+
+        /* --- Controls & Input --- */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: var(--bg-controls);
+            border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+
+        label {
+            font-weight: bold;
+            color: var(--text-heading);
+        }
+
+        select, button {
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s, border-color 0.3s, color 0.3s;
+        }
+
+        select {
+            border: 2px solid var(--border-dashed);
+            background-color: var(--bg-container);
+            color: var(--text-primary);
+            min-width: 150px;
+        }
+        
+        /* Ensure select arrow is visible in dark mode (optional, browser dependent) */
+        :root.dark-mode select {
+            color: var(--text-primary);
+        }
+
+        button {
+            border: none;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        #generate-btn {
+            background-color: var(--color-primary);
+        }
+
+        #generate-btn:hover {
+            background-color: #2980b9; /* Slightly darker on hover regardless of mode */
+        }
+        
+        #dark-mode-toggle {
+            background-color: #6c757d; /* Neutral gray */
+        }
+        
+        #dark-mode-toggle:hover {
+            background-color: #5a6268;
+        }
+
+        #copy-btn {
+            background-color: var(--color-success);
+            margin-left: 10px;
+            display: none;
+        }
+
+        #copy-btn:hover {
+            background-color: #27ae60;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        /* --- Team Display --- */
+        #team-output {
+            margin-top: 20px;
+            min-height: 150px;
+        }
+
+        .pokemon-list {
+            list-style: none;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .pokemon-card {
+            background-color: var(--bg-controls);
+            border: 1px solid var(--border-default);
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .pokemon-card h3 {
+            margin-top: 0;
+            margin-bottom: 5px;
+            color: var(--color-primary);
+            font-size: 1.3em;
+        }
+
+        .pokemon-card p {
+            margin: 0;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+
+        .no-team-message {
+            text-align: center;
+            color: var(--color-placeholder);
+            padding: 30px;
+            border: 2px dashed var(--border-dashed);
+            border-radius: 8px;
+            margin-top: 20px;
+            transition: color 0.3s, border-color 0.3s;
+        }
+
+        /* --- Export Text Area --- */
+        #export-text-area {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid var(--border-default);
+            border-radius: 6px;
+            margin-top: 15px;
+            resize: vertical;
+            font-family: monospace;
+            font-size: 0.9em;
+            background-color: var(--bg-body); /* Slightly darker than container */
+            color: var(--text-primary);
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✨ Pokémon Team Generator</h1>
+        <p>Choose your format and style, and instantly generate a competitive 6-Pokémon team.</p>
+
+        <div class="controls">
+            <div>
+                <label for="format-select">Format:</label>
+                <select id="format-select">
+                    </select>
+            </div>
+            
+            <div>
+                <label for="style-select">Style:</label>
+                <select id="style-select">
+                    </select>
+            </div>
+            
+            <button id="dark-mode-toggle">Toggle Dark Mode 🌙</button>
+            <button id="generate-btn">Generate Team</button>
+            <button id="copy-btn">Copy Team</button>
+        </div>
+
+        <hr>
+
+        <div id="team-output">
+            <div class="no-team-message">
+                Click 'Generate Team' to build your first squad!
+            </div>
+        </div>
+
+        <textarea id="export-text-area" readonly style="display: none;"></textarea>
+
+    </div>
+
+    <script>
+        // =========================================================
+        //                 1. DATA STORE (JSON)
+        // =========================================================
+        const POKEDEX = [
+            { id: 1, name: "Ferrothorn", type: ["Grass", "Steel"], role: "Tank", category: "Physical", format: "OU" },
+            { id: 2, name: "Landorus-T", type: ["Ground", "Flying"], role: "Pivot", category: "Physical", format: "OU" },
+            { id: 3, name: "Toxapex", type: ["Poison", "Water"], role: "Tank", category: "Mixed", format: "OU" },
+            { id: 4, name: "Dracovish", type: ["Water", "Dragon"], role: "Offensive", category: "Physical", format: "OU" },
+            { id: 5, name: "Dragapult", type: ["Dragon", "Ghost"], role: "Sweeper", category: "Mixed", format: "OU" }, 
+            { id: 6, name: "Clefable", type: ["Fairy"], role: "Support", category: "Special", format: "OU" },
+            { id: 7, name: "Garchomp", type: ["Dragon", "Ground"], role: "Offensive", category: "Physical", format: "OU" },
+            { id: 8, name: "Excadrill", type: ["Ground", "Steel"], role: "Sweeper", category: "Physical", format: "OU" },
+            { id: 9, name: "Tapu Fini", type: ["Water", "Fairy"], role: "Pivot", category: "Special", format: "OU" },
+            { id: 10, name: "Cinderace", type: ["Fire"], role: "Sweeper", category: "Physical", format: "OU" },
+            { id: 11, name: "Regieleki", type: ["Electric"], role: "Sweeper", category: "Special", format: "VGC" },
+            { id: 12, name: "Indeedee-F", type: ["Psychic", "Fairy"], role: "Support", category: "Special", format: "VGC" },
+            { id: 13, name: "Urshifu-RS", type: ["Water", "Fighting"], role: "Offensive", category: "Physical", format: "VGC" },
+            { id: 14, name: "Tornadus-I", type: ["Flying"], role: "Support", category: "Special", format: "VGC" },
+            { id: 15, name: "Rillaboom", type: ["Grass"], role: "Offensive", category: "Physical", format: "VGC" },
+            { id: 16, name: "Zacian-C", type: ["Fairy", "Steel"], role: "Offensive", category: "Physical", format: "VGC" },
+            { id: 17, name: "Pikachu", type: ["Electric"], role: "Random", category: "Special", format: "Casual" },
+            { id: 18, name: "Bidoof", type: ["Normal"], role: "Random", category: "Physical", format: "Casual" },
+            { id: 19, name: "Magikarp", type: ["Water"], role: "Random", category: "Physical", format: "Casual" },
+            { id: 20, name: "Snorlax", type: ["Normal"], role: "Tank", category: "Physical", format: "Casual" },
+            { id: 21, name: "Volcarona", type: ["Bug", "Fire"], role: "Sweeper", category: "Special", format: "Balanced" },
+            { id: 22, name: "Rotom-W", type: ["Electric", "Water"], role: "Pivot", category: "Special", format: "Balanced" },
+            { id: 23, name: "Skarmory", type: ["Steel", "Flying"], role: "Tank", category: "Physical", format: "Balanced" },
+            { id: 24, name: "Zapdos", type: ["Electric", "Flying"], role: "Pivot", category: "Special", format: "Balanced" },
+        ];
+
+        const FORMATS = {
+            "OU": "Singles OverUsed (6v6)",
+            "VGC": "VGC Doubles (4v4)",
+            "Casual": "Random Casual (6v6)",
+        };
+
+        const STYLES = {
+            "Balanced": "Balanced (Mix of Roles)",
+            "Offensive": "Hyper Offensive (4+ Sweepers)",
+            "Random": "Completely Random",
+        };
+
+        const STYLE_RULES = {
+            "Balanced": ["Tank", "Pivot", "Sweeper", "Offensive", "Support"], 
+            "Offensive": ["Sweeper", "Offensive"], 
+            "Random": ["Tank", "Pivot", "Sweeper", "Offensive", "Support", "Random"] 
+        };
+
+        const TYPE_ADVANTAGES = {
+            "Fighting": ["Normal", "Rock", "Steel", "Ice", "Dark"],
+            "Ground": ["Poison", "Rock", "Steel", "Fire", "Electric"],
+            "Water": ["Ground", "Rock", "Fire"],
+            "Fire": ["Bug", "Steel", "Grass", "Ice"],
+            "Electric": ["Water", "Flying"],
+        };
+
+        // =========================================================
+        //                 2. CORE LOGIC FUNCTIONS (Team Generation)
+        // =========================================================
+
+        function getRandomElement(arr) {
+            if (arr.length === 0) return null;
+            const index = Math.floor(Math.random() * arr.length);
+            return arr[index];
+        }
+
+        function hasEgregiousWeakness(currentTeam, newPokemon) {
+            const offensiveTypes = ["Water", "Ground", "Fire", "Fighting"];
+            let sharedWeaknesses = {};
+            const entireTeam = [...currentTeam, newPokemon];
+
+            for (const teamMember of entireTeam) {
+                for (const attackerType of offensiveTypes) {
+                    if (TYPE_ADVANTAGES[attackerType]) {
+                        if (teamMember.type.some(t => TYPE_ADVANTAGES[attackerType].includes(t))) {
+                            sharedWeaknesses[attackerType] = (sharedWeaknesses[attackerType] || 0) + 1;
+                        }
+                    }
+                }
+            }
+            
+            for (const type in sharedWeaknesses) {
+                if (sharedWeaknesses[type] >= 4) {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+
+
+        function generateTeam(formatKey, styleKey) {
+            const pool = POKEDEX.filter(p => p.format === formatKey || p.format === "Balanced");
+            if (pool.length < 6) {
+                return [];
+            }
+
+            const team = [];
+            const requiredRoles = STYLE_RULES[styleKey];
+            const selectedIds = new Set();
+            
+            while (team.length < 6) {
+                let candidate = null;
+                let filteredCandidates = [];
+
+                if (styleKey !== "Random") {
+                    const availableRoles = requiredRoles.filter(role => !team.some(p => p.role === role));
+                    if (availableRoles.length > 0) {
+                        const targetRole = getRandomElement(availableRoles);
+                        filteredCandidates = pool.filter(p => p.role === targetRole && !selectedIds.has(p.id));
+                    }
+                }
+
+                if (filteredCandidates.length === 0) {
+                    filteredCandidates = pool.filter(p => !selectedIds.has(p.id));
+                }
+
+                candidate = getRandomElement(filteredCandidates);
+                
+                if (!candidate) {
+                    break;
+                }
+
+                if (hasEgregiousWeakness(team, candidate)) {
+                    const candidateIndex = pool.indexOf(candidate);
+                    if (candidateIndex > -1) {
+                        pool.splice(candidateIndex, 1);
+                    }
+                    continue; 
+                }
+
+                team.push(candidate);
+                selectedIds.add(candidate.id);
+            }
+
+            return team;
+        }
+
+        // =========================================================
+        //                 3. DOM MANIPULATION / UX
+        // =========================================================
+
+        const htmlRoot = document.documentElement;
+        const formatSelect = document.getElementById('format-select');
+        const styleSelect = document.getElementById('style-select');
+        const generateBtn = document.getElementById('generate-btn');
+        const copyBtn = document.getElementById('copy-btn');
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        const teamOutput = document.getElementById('team-output');
+        const exportTextArea = document.getElementById('export-text-area');
+
+        let currentTeam = []; 
+
+        /**
+         * Populates the Format and Style dropdowns.
+         */
+        function populateDropdowns() {
+            for (const key in FORMATS) {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = FORMATS[key];
+                formatSelect.appendChild(option);
+            }
+            for (const key in STYLES) {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = STYLES[key];
+                styleSelect.appendChild(option);
+            }
+        }
+
+
+        /**
+         * Renders the generated team to the UI and updates the export area with dynamic EVs/Natures.
+         */
+        function renderTeam(team) {
+            currentTeam = team;
+            teamOutput.innerHTML = ''; 
+
+            if (team.length === 0) {
+                teamOutput.innerHTML = '<div class="no-team-message">Could not generate a viable team with the current rules. Try another format/style.</div>';
+                copyBtn.style.display = 'none';
+                exportTextArea.style.display = 'none';
+                exportTextArea.value = '';
+                return;
+            }
+
+            // Render team visually
+            const ul = document.createElement('ul');
+            ul.classList.add('pokemon-list');
+            team.forEach(p => {
+                const li = document.createElement('li');
+                li.classList.add('pokemon-card');
+                li.innerHTML = `
+                    <h3>${p.name}</h3>
+                    <p><strong>Role:</strong> ${p.role}</p>
+                    <p><strong>Type:</strong> ${p.type.join(' / ')}</p>
+                    <p><strong>Category:</strong> ${p.category}</p>
+                `;
+                ul.appendChild(li);
+            });
+            teamOutput.appendChild(ul);
+
+            // Update Export Text (Dynamic EV/Nature)
+            const exportText = team.map(p => {
+                let evSpread = "";
+                let nature = ""; 
+
+                // 1. Check for defensive roles
+                if (p.role === "Tank" || p.role === "Support" || p.role === "Pivot") {
+                    evSpread = "252 HP / 252 Def / 4 SpD";
+                    nature = "Impish"; 
+                } 
+                // 2. Check for Special attackers
+                else if (p.category === "Special" || p.role === "Sweeper" && p.category !== "Physical") {
+                    evSpread = "252 SpA / 4 Def / 252 Spe";
+                    nature = "Timid"; 
+                } 
+                // 3. Check for Mixed attackers
+                else if (p.category === "Mixed") {
+                    evSpread = "252 Atk / 4 SpA / 252 Spe";
+                    nature = "Hasty";
+                }
+                // 4. Default to Physical
+                else {
+                    evSpread = "252 Atk / 4 Def / 252 Spe";
+                    nature = "Jolly"; 
+                }
+                
+                return `${p.name} @ [Item Placeholder]\nAbility: [Ability Placeholder]\nEVs: ${evSpread}\nNature: ${nature}\n- [Move 1]\n- [Move 2]\n- [Move 3]\n- [Move 4]`;
+            }).join('\n\n');
+            
+            exportTextArea.value = exportText;
+            copyBtn.style.display = 'inline-block';
+            exportTextArea.style.display = 'block';
+        }
+
+        function handleGenerateClick() {
+            const selectedFormat = formatSelect.value;
+            const selectedStyle = styleSelect.value;
+            
+            generateBtn.textContent = 'Generating...';
+            generateBtn.disabled = true;
+
+            setTimeout(() => {
+                const team = generateTeam(selectedFormat, selectedStyle);
+                renderTeam(team);
+                
+                generateBtn.textContent = 'Generate Again'; 
+                generateBtn.disabled = false;
+            }, 300); 
+        }
+
+        function handleCopyClick() {
+            if (currentTeam.length === 0) return;
+
+            exportTextArea.select();
+            document.execCommand('copy');
+
+            const originalText = copyBtn.textContent;
+            copyBtn.textContent = 'Copied!';
+            setTimeout(() => {
+                copyBtn.textContent = originalText;
+            }, 1500);
+        }
+        
+        // =========================================================
+        //                 4. DARK MODE LOGIC
+        // =========================================================
+
+        /**
+         * Toggles the 'dark-mode' class on the HTML root element.
+         */
+        function toggleDarkMode() {
+            if (htmlRoot.classList.contains('dark-mode')) {
+                htmlRoot.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light');
+                darkModeToggle.textContent = 'Toggle Dark Mode 🌙';
+            } else {
+                htmlRoot.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
+                darkModeToggle.textContent = 'Toggle Light Mode ☀️';
+            }
+        }
+        
+        /**
+         * Applies the saved theme preference or system preference on page load.
+         */
+        function applySavedTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            
+            if (savedTheme === 'dark' || 
+                (savedTheme === null && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                // If saved preference is dark OR no preference saved and system prefers dark
+                htmlRoot.classList.add('dark-mode');
+                darkModeToggle.textContent = 'Toggle Light Mode ☀️';
+            } else {
+                htmlRoot.classList.remove('dark-mode');
+                darkModeToggle.textContent = 'Toggle Dark Mode 🌙';
+            }
+        }
+
+
+        // =========================================================
+        //                 5. INITIALIZATION & LISTENERS
+        // =========================================================
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Apply saved theme preference immediately
+            applySavedTheme();
+            
+            // 2. Setup Dropdowns
+            populateDropdowns();
+
+            // 3. Attach Event Listeners
+            generateBtn.addEventListener('click', handleGenerateClick);
+            copyBtn.addEventListener('click', handleCopyClick);
+            darkModeToggle.addEventListener('click', toggleDarkMode); // Dark Mode Listener
+
+            // Initial view setup: Set the initial button text
+            generateBtn.textContent = 'Generate Team';
+        });
+    </script>
+</body>
+</html>
